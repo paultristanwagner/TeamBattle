@@ -7,6 +7,7 @@ import de.teamcreate.teambattle.game.TeamBattleTeam;
 import de.teamcreate.teambattle.util.ItemUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryType;
@@ -44,6 +45,7 @@ public class TeamSelectInventoryHandler extends InventoryHandler {
                 } else {
                     newTeam.addMember( player );
                 }
+                player.playSound( player.getLocation(), Sound.BLOCK_NOTE_PLING, 1, 1 );
             }
         }
     }

@@ -4,6 +4,7 @@ import de.teamcreate.itemcommons.ItemBuilder;
 import de.teamcreate.teambattle.game.TeamBattleTeam;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.List;
@@ -22,6 +23,22 @@ public class ItemUtils {
 
     public static final ItemStack TEAM_SELECT = new ItemBuilder( Material.BED ).setName( "§aTeamauswahl" )
             .setDurability( 14 ).build();
+
+    public static final ItemStack RULES = new ItemBuilder( Material.BOOK ).setName( "§5Regeln" ).build();
+
+    public static final ItemStack SPACER = new ItemBuilder( Material.STAINED_GLASS_PANE ).setName( " " ).setDurability( 14 ).build();
+
+    public static final ItemStack FAIR_PLAY = new ItemBuilder( Material.GOLD_SWORD ).setName( "§cFaires Spiel" ).addItemFlag( ItemFlag.HIDE_ATTRIBUTES ).build();
+
+    public static final ItemStack NO_NOTCH_APPLES = new ItemBuilder( Material.GOLDEN_APPLE ).setDurability( 1 ).setName( "§cKeine OP-Goldäpfel" ).build();
+
+    public static final ItemStack NO_RIDING = new ItemBuilder( Material.SADDLE ).setName( "§cKeine Tiere reiten" ).build();
+
+    public static final ItemStack NO_PORTALS = new ItemBuilder( Material.BEDROCK ).setName( "§cKeine Portale verwenden" ).build();
+
+    public static final ItemStack NO_TOWERING = new ItemBuilder( Material.WOOD_AXE ).setName( "§cKein Towern" ).addItemFlag( ItemFlag.HIDE_ATTRIBUTES ).build();
+
+    public static final ItemStack SURFACE = new ItemBuilder( Material.GRASS ).setName( "§cNach der Schutzzeit an die Oberfläche" ).build();
 
     public static ItemStack getTeamItemStack( Player player, TeamBattleTeam teamBattleTeam ) {
         ItemBuilder itemBuilder = new ItemBuilder( Material.WOOL );

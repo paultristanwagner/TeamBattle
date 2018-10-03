@@ -7,6 +7,7 @@ import de.teamcreate.teambattle.game.Game;
 import de.teamcreate.teambattle.game.TeamBattleTeam;
 import de.teamcreate.teambattle.event.PlayerQuitTeamEvent;
 import de.teamcreate.teambattle.game.GameState;
+import de.teamcreate.teambattle.inventoryhandler.RulesInventoryHandler;
 import de.teamcreate.teambattle.inventoryhandler.TeamSelectInventoryHandler;
 import de.teamcreate.teambattle.util.ItemUtils;
 import org.bukkit.GameMode;
@@ -148,9 +149,12 @@ public class GameListener implements Listener {
             event.setCancelled( true );
             ItemStack itemStack = event.getItem();
             Action action = event.getAction();
-            if ( itemStack != null && ( action == Action.RIGHT_CLICK_BLOCK || action == Action.RIGHT_CLICK_AIR ) &&
-                    event.getItem().isSimilar( ItemUtils.TEAM_SELECT ) ) {
-                new TeamSelectInventoryHandler( teamBattlePlugin, player, null ).openWithSoundEffect( Sound.UI_BUTTON_CLICK );
+            if ( itemStack != null && ( action == Action.RIGHT_CLICK_BLOCK || action == Action.RIGHT_CLICK_AIR ) ) {
+                if ( event.getItem().isSimilar( ItemUtils.TEAM_SELECT ) ) {
+                    new TeamSelectInventoryHandler( teamBattlePlugin, player, null ).openWithSoundEffect( Sound.BLOCK_NOTE_PLING );
+                } else if ( event.getItem().isSimilar( ItemUtils.RULES ) ) {
+                    new RulesInventoryHandler( teamBattlePlugin, player, null ).openWithSoundEffect( Sound.BLOCK_NOTE_PLING );
+                }
             }
         }
     }

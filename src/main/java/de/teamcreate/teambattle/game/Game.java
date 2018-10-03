@@ -61,7 +61,8 @@ public class Game {
 
     public void setPlayer( Player player ) {
         resetPlayer( player );
-        player.getInventory().setItem( 4, ItemUtils.TEAM_SELECT );
+        player.getInventory().setItem( 0, ItemUtils.TEAM_SELECT );
+        player.getInventory().setItem( 4, ItemUtils.RULES );
     }
 
     public void resetPlayers() {
