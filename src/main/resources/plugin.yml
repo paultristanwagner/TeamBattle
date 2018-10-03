@@ -1,0 +1,9 @@
+name: TeamBattle
+version: 1.1
+author: LetsPeee
+main: de.teamcreate.teambattle.TeamBattlePlugin
+commands:
+  teambattle:
+    description: "§bAdministriere das TeamBattle"
+    aliases: tb
+    usage: "§cSyntax Fehler! Verwende /<command> [start]"
