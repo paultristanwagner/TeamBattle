@@ -12,8 +12,7 @@ import de.teamcreate.teambattle.util.ItemUtils;
 import org.bukkit.GameMode;
 import org.bukkit.Material;
 import org.bukkit.Sound;
-import org.bukkit.entity.Horse;
-import org.bukkit.entity.Player;
+import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
@@ -75,9 +74,11 @@ public class GameListener implements Listener {
 
     @EventHandler
     public void onEntityMount( EntityMountEvent event ) {
-        if ( event.getEntity() instanceof Player && event.getMount() instanceof Horse ) {
+        if ( event.getEntity() instanceof Player &&
+                ( event.getMount() instanceof Horse || event.getMount() instanceof Pig ||
+                        event.getMount() instanceof Mule || event.getMount() instanceof Donkey ) ) {
             event.setCancelled( true );
-            game.sendGameMessage( ( (Player) event.getEntity() ), "§cDu darfst keine Pferde reiten!" );
+            game.sendGameMessage( ( (Player) event.getEntity() ), "§cDu darfst keine Tiere reiten!" );
         }
     }
 
