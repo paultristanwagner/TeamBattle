@@ -34,25 +34,25 @@ public class PregameCountdown {
 
     private void run() {
         seconds--;
-        if(seconds == 0) {
+        if ( seconds == 0 ) {
             game.changeGameState();
             bukkitTask.cancel();
-        } else if( seconds % 300 == 0) {
+        } else if ( seconds % 300 == 0 ) {
             int minutes = seconds / 60;
-            game.sendGameMessage( "§eDie Kriegsphase beginnt in §5" + minutes + " §eMinuten!");
+            game.sendGameMessage( "§eDie Kriegsphase beginnt in §5" + minutes + " §eMinuten!" );
             game.playGameSound( Sound.BLOCK_NOTE_PLING, 1, 1 );
         } else if ( seconds == 60 || seconds == 30 || seconds == 20 || seconds == 10 || seconds == 5 || seconds == 4 ||
-                seconds == 3 || seconds == 2) {
-            game.sendGameMessage( "§cDie Kriegsphase beginnt in §5" + seconds + " §cSekunden!");
+                seconds == 3 || seconds == 2 ) {
+            game.sendGameMessage( "§cDie Kriegsphase beginnt in §5" + seconds + " §cSekunden!" );
             game.playGameSound( Sound.BLOCK_NOTE_PLING, 1, 1 );
-        } else if( seconds == 1 ) {
-            game.sendGameMessage( "§cDie Kriegsphase beginnt in einer Sekunde!");
+        } else if ( seconds == 1 ) {
+            game.sendGameMessage( "§cDie Kriegsphase beginnt in einer Sekunde!" );
             game.playGameSound( Sound.BLOCK_NOTE_PLING, 1, 1 );
         }
     }
 
     public void stop() {
-        if(bukkitTask != null) {
+        if ( bukkitTask != null ) {
             bukkitTask.cancel();
         }
     }

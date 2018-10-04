@@ -1,9 +1,9 @@
 package de.teamcreate.teambattle;
 
 import de.teamcreate.teambattle.executor.TeamBattleExecutor;
-import lombok.Getter;
 import de.teamcreate.teambattle.game.Game;
 import de.teamcreate.teambattle.listener.GameListener;
+import lombok.Getter;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
 

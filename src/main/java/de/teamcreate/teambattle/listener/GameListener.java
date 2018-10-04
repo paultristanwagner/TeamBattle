@@ -3,10 +3,11 @@ package de.teamcreate.teambattle.listener;
 import de.teamcreate.teambattle.TeamBattlePlugin;
 import de.teamcreate.teambattle.event.GameStateChangeEvent;
 import de.teamcreate.teambattle.event.PlayerJoinTeamEvent;
-import de.teamcreate.teambattle.game.Game;
-import de.teamcreate.teambattle.game.TeamBattleTeam;
 import de.teamcreate.teambattle.event.PlayerQuitTeamEvent;
+import de.teamcreate.teambattle.game.Game;
 import de.teamcreate.teambattle.game.GameState;
+import de.teamcreate.teambattle.game.TeamBattleTeam;
+import de.teamcreate.teambattle.inventoryhandler.OperatorInventoryHandler;
 import de.teamcreate.teambattle.inventoryhandler.RulesInventoryHandler;
 import de.teamcreate.teambattle.inventoryhandler.TeamSelectInventoryHandler;
 import de.teamcreate.teambattle.util.ItemUtils;
@@ -154,6 +155,8 @@ public class GameListener implements Listener {
                     new TeamSelectInventoryHandler( teamBattlePlugin, player, null ).openWithSoundEffect( Sound.BLOCK_NOTE_PLING );
                 } else if ( event.getItem().isSimilar( ItemUtils.RULES ) ) {
                     new RulesInventoryHandler( teamBattlePlugin, player, null ).openWithSoundEffect( Sound.BLOCK_NOTE_PLING );
+                } else if ( event.getItem().isSimilar( ItemUtils.OPERATOR ) ) {
+                    new OperatorInventoryHandler( teamBattlePlugin, player, null ).openWithSoundEffect( Sound.BLOCK_NOTE_PLING );
                 }
             }
         }

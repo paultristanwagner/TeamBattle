@@ -25,19 +25,19 @@ public class TeamBattleExecutor implements CommandExecutor {
 
     @Override
     public boolean onCommand( CommandSender commandSender, Command command, String label, String[] args ) {
-        if( !( commandSender instanceof Player ) ) {
+        if ( !( commandSender instanceof Player ) ) {
             commandSender.sendMessage( "§cThis command can only be executed by players!" );
             return true;
         } else {
             Player player = ( (Player) commandSender );
-            if(args.length == 1 && args[0].equalsIgnoreCase( "start" )) {
-                if(player.hasPermission( "teambattle.operate" )) {
+            if ( args.length == 1 && args[0].equalsIgnoreCase( "start" ) ) {
+                if ( player.hasPermission( "teambattle.operate" ) ) {
                     game.attemptStart( player );
                 } else {
                     player.sendMessage( command.getPermissionMessage() );
                 }
                 return true;
-            } else if(args.length == 0) {
+            } else if ( args.length == 0 ) {
                 game.sendGameMessage( player, "§ePlugin §ev" + teamBattlePlugin.getDescription().getVersion() + " §eby §5LetsPeee" );
                 return true;
             }

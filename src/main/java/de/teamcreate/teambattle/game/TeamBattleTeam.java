@@ -1,8 +1,8 @@
 package de.teamcreate.teambattle.game;
 
 import de.teamcreate.teambattle.event.PlayerJoinTeamEvent;
-import lombok.Getter;
 import de.teamcreate.teambattle.event.PlayerQuitTeamEvent;
+import lombok.Getter;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.scoreboard.Scoreboard;
@@ -39,7 +39,7 @@ public class TeamBattleTeam {
         ScoreboardManager scoreboardManager = Bukkit.getScoreboardManager();
         scoreboard = scoreboardManager.getNewScoreboard();
         scoreboardTeam = scoreboard.getTeam( teamName );
-        if(scoreboardTeam != null) {
+        if ( scoreboardTeam != null ) {
             scoreboardTeam.unregister();
         }
         scoreboardTeam = scoreboard.registerNewTeam( teamName );
@@ -68,7 +68,7 @@ public class TeamBattleTeam {
         members.remove( player );
         scoreboardTeam.removeEntry( player.getName() );
         player.setScoreboard( Bukkit.getScoreboardManager().getMainScoreboard() );
-        Bukkit.getPluginManager().callEvent( new PlayerQuitTeamEvent( player, this, true) );
+        Bukkit.getPluginManager().callEvent( new PlayerQuitTeamEvent( player, this, true ) );
         newTeam.addMember( player );
     }
 

@@ -1,8 +1,8 @@
 package de.teamcreate.teambattle.event;
 
+import de.teamcreate.teambattle.game.GameState;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-import de.teamcreate.teambattle.game.GameState;
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
 

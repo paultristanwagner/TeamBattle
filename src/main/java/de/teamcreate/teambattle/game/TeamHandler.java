@@ -34,6 +34,10 @@ public class TeamHandler {
         return teams.stream().filter( teamBattleTeam -> teamBattleTeam.getTeamName().equals( teamName ) ).findFirst().orElse( null );
     }
 
+    public int getUsedTeams() {
+        return (int) teams.stream().filter( team -> !team.getMembers().isEmpty() ).count();
+    }
+
     public void updateInventories() {
         teamSelectInventoryHandlers.forEach( TeamSelectInventoryHandler::fillInventory );
     }

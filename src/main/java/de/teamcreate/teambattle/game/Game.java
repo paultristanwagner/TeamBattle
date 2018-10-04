@@ -63,6 +63,9 @@ public class Game {
         resetPlayer( player );
         player.getInventory().setItem( 0, ItemUtils.TEAM_SELECT );
         player.getInventory().setItem( 4, ItemUtils.RULES );
+        if ( player.isOp() ) {
+            player.getInventory().setItem( 8, ItemUtils.OPERATOR );
+        }
     }
 
     public void resetPlayers() {
@@ -94,16 +97,27 @@ public class Game {
 
     public void attemptStart( Player operator ) {
         boolean startable = true;
+        StringBuilder builder = new StringBuilder();
         for ( Player player : Bukkit.getOnlinePlayers() ) {
             TeamBattleTeam team = teamHandler.getTeam( player );
             if ( team == null ) {
                 startable = false;
-                sendGameMessage( operator, "§cDas Spiel kann nicht gestartet werden, da §e" + player.getName() +
-                        " §cnoch keinem Team zugehörig ist!" );
+                builder.append( ", " ).append( player.getName() );
             }
+        }
+        if ( builder.length() > 0 ) {
+            startable = false;
+            sendGameMessage( operator, "§cDas Spiel kann nicht gestartet werden, da folgende§7/§cr Spieler noch keinem " +
+                    "Team zugeordnet sind§7/§cist§7: §b" + builder.substring( 2 ) );
+        }
+        if ( teamHandler.getUsedTeams() <= 1 ) {
+            sendGameMessage( operator, "§cDas Spiel kann nicht gestartet werden, da nicht genügend Teams teilnehmen!" );
+            startable = false;
         }
         if ( startable ) {
             changeGameState();
+        } else {
+            operator.playSound( operator.getLocation(), Sound.BLOCK_NOTE_BASS, 1, 1 );
         }
     }
 
