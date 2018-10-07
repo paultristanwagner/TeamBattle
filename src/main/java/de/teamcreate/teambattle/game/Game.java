@@ -167,14 +167,13 @@ public class Game {
         if ( members.size() == 1 ) {
             Player winner = members.get( 0 );
             sendGameMessage( "§eDer Spieler §b" + winner.getName() + " §ehat das Spiel gewonnen!" );
-            playGameSound( Sound.ENTITY_FIREWORK_TWINKLE, 1, 1 );
         } else {
             StringBuilder stringBuilder = new StringBuilder();
             for ( int i = 0; i < members.size(); i++ ) {
                 if ( i < members.size() - 1 ) {
-                    stringBuilder.append( " §7und " );
-                } else {
                     stringBuilder.append( " §7, " );
+                } else {
+                    stringBuilder.append( " §7und " );
                 }
                 Player member = members.get( i );
                 stringBuilder.append( "§b" ).append( member.getName() );
@@ -182,6 +181,7 @@ public class Game {
             String winners = stringBuilder.substring( 5 );
             sendGameMessage( "§eDie Spieler §b" + winners + " §ehaben das Spiel gewonnen!" );
         }
+        playGameSound( Sound.ENTITY_FIREWORK_TWINKLE, 1, 1 );
         changeGameState( GameState.END );
     }
 }
