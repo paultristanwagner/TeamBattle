@@ -6,7 +6,6 @@ import de.teamcreate.teambattle.event.GameStateChangeEvent;
 import de.teamcreate.teambattle.util.ItemUtils;
 import lombok.Getter;
 import org.bukkit.*;
-import org.bukkit.attribute.Attribute;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.potion.PotionEffect;
@@ -80,8 +79,8 @@ public class Game {
         player.getInventory().setChestplate( null );
         player.getInventory().setHelmet( null );
         player.getActivePotionEffects().stream().map( PotionEffect::getType ).forEach( player::removePotionEffect );
-        player.getAttribute( Attribute.GENERIC_MAX_HEALTH ).setBaseValue( 20.0 );
-        player.setHealth( player.getAttribute( Attribute.GENERIC_MAX_HEALTH ).getBaseValue() );
+        player.setMaxHealth( 20.0 );
+        player.setHealth( player.getMaxHealth() );
         player.setFoodLevel( 20 );
         player.setSaturation( 6 );
         player.setLevel( 0 );
@@ -117,7 +116,7 @@ public class Game {
         if ( startable ) {
             changeGameState();
         } else {
-            operator.playSound( operator.getLocation(), Sound.BLOCK_NOTE_BASS, 1, 1 );
+            operator.playSound( operator.getLocation(), Sound.NOTE_BASS, 1, 1 );
         }
     }
 
@@ -181,7 +180,7 @@ public class Game {
             String winners = stringBuilder.substring( 5 );
             sendGameMessage( "§eDie Spieler §b" + winners + " §ehaben das Spiel gewonnen!" );
         }
-        playGameSound( Sound.ENTITY_FIREWORK_TWINKLE, 1, 1 );
+        playGameSound( Sound.FIREWORK_TWINKLE, 1, 1 );
         changeGameState( GameState.END );
     }
 }

@@ -26,7 +26,7 @@ public class ConfirmationInventoryHandler extends InventoryHandler {
         event.setCancelled( true );
         if ( event.getCurrentItem().isSimilar( ItemUtils.ABORT ) ) {
             if ( parent != null ) {
-                parent.openWithSoundEffect( Sound.BLOCK_NOTE_BASS );
+                parent.openWithSoundEffect( Sound.NOTE_BASS );
             } else {
                 player.closeInventory();
             }

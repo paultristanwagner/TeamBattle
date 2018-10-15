@@ -19,8 +19,7 @@ import java.util.List;
  */
 public class ItemUtils {
 
-    public static final ItemStack TEAM_SELECT = new ItemBuilder( Material.BED ).setName( "§aTeamauswahl" )
-            .setDurability( 14 ).build();
+    public static final ItemStack TEAM_SELECT = new ItemBuilder( Material.BED ).setName( "§aTeamauswahl" ).build();
     public static final ItemStack RULES = new ItemBuilder( Material.BOOK ).setName( "§5Regeln" ).build();
     public static final ItemStack OPERATOR = new ItemBuilder( Material.COMMAND ).setName( "§bAdministration" ).build();
     public static final ItemStack SPACER = new ItemBuilder( Material.STAINED_GLASS_PANE ).setName( " " ).setDurability( 3 ).build();

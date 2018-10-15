@@ -39,13 +39,17 @@ public class TeamSelectInventoryHandler extends InventoryHandler {
             displayName = ChatColor.stripColor( displayName );
             TeamBattleTeam newTeam = game.getTeamHandler().getTeam( displayName );
             if ( newTeam != null ) {
-                TeamBattleTeam currentTeam = game.getTeamHandler().getTeam( player );
-                if ( currentTeam != null ) {
-                    currentTeam.switchTeams( player, newTeam );
+                if ( !newTeam.isFull() ) {
+                    TeamBattleTeam currentTeam = game.getTeamHandler().getTeam( player );
+                    if ( currentTeam != null ) {
+                        currentTeam.switchTeams( player, newTeam );
+                    } else {
+                        newTeam.addMember( player );
+                    }
+                    player.playSound( player.getLocation(), Sound.NOTE_PLING, 1, 1 );
                 } else {
-                    newTeam.addMember( player );
+                    player.playSound( player.getLocation(), Sound.ITEM_BREAK, 1, 1 );
                 }
-                player.playSound( player.getLocation(), Sound.BLOCK_NOTE_PLING, 1, 1 );
             }
         }
     }

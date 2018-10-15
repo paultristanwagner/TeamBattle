@@ -25,7 +25,7 @@ public class OperatorInventoryHandler extends InventoryHandler {
     protected void clickItem( InventoryClickEvent event ) {
         event.setCancelled( true );
         if ( event.getCurrentItem().isSimilar( ItemUtils.START_GAME ) ) {
-            new ConfirmationInventoryHandler( javaPlugin, player, this ).openWithSoundEffect( Sound.BLOCK_NOTE_PLING );
+            new ConfirmationInventoryHandler( javaPlugin, player, this ).openWithSoundEffect( Sound.NOTE_PLING );
         }
     }
 

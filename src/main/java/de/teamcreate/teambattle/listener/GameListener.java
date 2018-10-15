@@ -14,14 +14,19 @@ import de.teamcreate.teambattle.util.ItemUtils;
 import org.bukkit.GameMode;
 import org.bukkit.Material;
 import org.bukkit.Sound;
-import org.bukkit.entity.*;
+import org.bukkit.entity.Horse;
+import org.bukkit.entity.Pig;
+import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
-import org.bukkit.event.entity.*;
+import org.bukkit.event.entity.EntityDamageByEntityEvent;
+import org.bukkit.event.entity.EntityDamageEvent;
+import org.bukkit.event.entity.FoodLevelChangeEvent;
+import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.inventory.CraftItemEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.player.*;
@@ -77,8 +82,7 @@ public class GameListener implements Listener {
     @EventHandler
     public void onEntityMount( EntityMountEvent event ) {
         if ( event.getEntity() instanceof Player &&
-                ( event.getMount() instanceof Horse || event.getMount() instanceof Pig ||
-                        event.getMount() instanceof Mule || event.getMount() instanceof Donkey ) ) {
+                ( event.getMount() instanceof Horse || event.getMount() instanceof Pig ) ) {
             event.setCancelled( true );
             game.sendGameMessage( ( (Player) event.getEntity() ), "§cDu darfst keine Tiere reiten!" );
         }
@@ -93,7 +97,7 @@ public class GameListener implements Listener {
             if ( player.getKiller() != null ) {
                 Player killer = player.getKiller();
                 game.sendGameMessage( "§7Der Spieler §c" + player.getName() + " §7wurde von §a" + killer.getName() + " §7getötet!" );
-                killer.playSound( killer.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 63, 63 );
+                killer.playSound( killer.getLocation(), Sound.LEVEL_UP, 63, 63 );
             } else {
                 game.sendGameMessage( "§7Der Spieler §c" + player.getName() + " §7ist gestorben!" );
             }
@@ -125,12 +129,10 @@ public class GameListener implements Listener {
     }
 
     @EventHandler
-    public void onPlayerItemPickup( EntityPickupItemEvent event ) {
-        if ( event.getEntity() instanceof Player ) {
-            Player player = ( (Player) event.getEntity() );
-            if ( player.getGameMode() != GameMode.CREATIVE && !game.getGameState().isInteractionAllowed() ) {
-                event.setCancelled( true );
-            }
+    public void onPlayerItemPickup( PlayerPickupItemEvent event ) {
+        Player player = event.getPlayer();
+        if ( player.getGameMode() != GameMode.CREATIVE && !game.getGameState().isInteractionAllowed() ) {
+            event.setCancelled( true );
         }
     }
 
@@ -152,11 +154,11 @@ public class GameListener implements Listener {
             Action action = event.getAction();
             if ( itemStack != null && ( action == Action.RIGHT_CLICK_BLOCK || action == Action.RIGHT_CLICK_AIR ) ) {
                 if ( event.getItem().isSimilar( ItemUtils.TEAM_SELECT ) ) {
-                    new TeamSelectInventoryHandler( teamBattlePlugin, player, null ).openWithSoundEffect( Sound.BLOCK_NOTE_PLING );
+                    new TeamSelectInventoryHandler( teamBattlePlugin, player, null ).openWithSoundEffect( Sound.NOTE_PLING );
                 } else if ( event.getItem().isSimilar( ItemUtils.RULES ) ) {
-                    new RulesInventoryHandler( teamBattlePlugin, player, null ).openWithSoundEffect( Sound.BLOCK_NOTE_PLING );
+                    new RulesInventoryHandler( teamBattlePlugin, player, null ).openWithSoundEffect( Sound.NOTE_PLING );
                 } else if ( event.getItem().isSimilar( ItemUtils.OPERATOR ) ) {
-                    new OperatorInventoryHandler( teamBattlePlugin, player, null ).openWithSoundEffect( Sound.BLOCK_NOTE_PLING );
+                    new OperatorInventoryHandler( teamBattlePlugin, player, null ).openWithSoundEffect( Sound.NOTE_PLING );
                 }
             }
         }
@@ -238,7 +240,7 @@ public class GameListener implements Listener {
             game.startCountdown();
         } else if ( gameState == GameState.INGAME ) {
             game.sendGameMessage( "§cDie Kriegsphase hat begonnen!" );
-            game.playGameSound( Sound.ENTITY_ENDERDRAGON_GROWL, 1, 1 );
+            game.playGameSound( Sound.ENDERDRAGON_GROWL, 1, 1 );
         }
     }
 
