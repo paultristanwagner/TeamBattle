@@ -1,7 +1,33 @@
 gameSpawn:
+  ==: org.bukkit.Location
   world: world
   x: 0.0
   y: 5.0
   z: 0.0
   yaw: 0.0
   pitch: 0.0
+
+spawnRegion:
+  pos1:
+    ==: org.bukkit.Location
+    world: world
+    x: 0.0
+    y: 5.0
+    z: 0.0
+    yaw: 0.0
+    pitch: 0.0
+  pos2:
+    ==: org.bukkit.Location
+    world: world
+    x: 0.0
+    y: 5.0
+    z: 0.0
+    yaw: 0.0
+    pitch: 0.0
+
+arenaSize: 400
+finalSize: 30
+protectionMinutes: 40
+fightingMinutes: 40
+teams: 12
+teamSize: 3

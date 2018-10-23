@@ -1,8 +1,11 @@
 package de.teamcreate.teambattle.game;
 
 import com.google.common.collect.Lists;
+import de.teamcreate.teambattle.event.PlayerJoinTeamEvent;
+import de.teamcreate.teambattle.event.PlayerQuitTeamEvent;
 import de.teamcreate.teambattle.inventoryhandler.TeamSelectInventoryHandler;
 import lombok.Getter;
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
 import java.util.List;
@@ -20,10 +23,11 @@ public class TeamHandler {
     @Getter
     private List<TeamSelectInventoryHandler> teamSelectInventoryHandlers = Lists.newArrayList();
 
-    public TeamHandler( int teams ) {
+    TeamHandler( int teams, int teamSize ) {
         for ( int i = 1; i <= teams; i++ ) {
-            this.teams.add( new TeamBattleTeam( i ) );
+            this.teams.add( new TeamBattleTeam( this, i, teamSize ) );
         }
+        this.teams.forEach( TeamBattleTeam::setupScoreboard );
     }
 
     public TeamBattleTeam getTeam( Player player ) {
@@ -34,7 +38,24 @@ public class TeamHandler {
         return teams.stream().filter( teamBattleTeam -> teamBattleTeam.getTeamName().equals( teamName ) ).findFirst().orElse( null );
     }
 
-    public int getUsedTeams() {
+    public void joinTeam( TeamBattleTeam teamBattleTeam, Player player ) {
+        teams.forEach( team -> team.handleMemberAdd( teamBattleTeam, player ) );
+        Bukkit.getPluginManager().callEvent( new PlayerJoinTeamEvent( player, teamBattleTeam ) );
+    }
+
+    public void quitTeam( TeamBattleTeam teamBattleTeam, Player player ) {
+        teams.forEach( team -> team.handleMemberRemove( teamBattleTeam, player ) );
+        Bukkit.getPluginManager().callEvent( new PlayerQuitTeamEvent( player, teamBattleTeam ) );
+    }
+
+    public void switchTeams( TeamBattleTeam oldTeam, TeamBattleTeam newTeam, Player player ) {
+        teams.forEach( team -> team.handleMemberRemove( oldTeam, player ) );
+        teams.forEach( team -> team.handleMemberAdd( newTeam, player ) );
+        Bukkit.getPluginManager().callEvent( new PlayerQuitTeamEvent( player, oldTeam, true ) );
+        Bukkit.getPluginManager().callEvent( new PlayerJoinTeamEvent( player, newTeam ) );
+    }
+
+    int getUsedTeams() {
         return (int) teams.stream().filter( team -> !team.getMembers().isEmpty() ).count();
     }
 
@@ -53,7 +74,7 @@ public class TeamHandler {
     public TeamBattleTeam getRemainingTeam() {
         TeamBattleTeam remaining = null;
         for ( TeamBattleTeam team : teams ) {
-            if ( !team.getMembers().isEmpty() ) {
+            if ( !team.getMembers().isEmpty() && team.arePlayersOnline() ) {
                 if ( remaining != null ) {
                     remaining = null;
                     break;

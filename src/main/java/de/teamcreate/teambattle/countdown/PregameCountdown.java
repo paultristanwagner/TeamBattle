@@ -17,16 +17,19 @@ public class PregameCountdown {
     private TeamBattlePlugin teamBattlePlugin;
     private Game game;
     private BukkitTask bukkitTask;
-    private int startMinutes = 40;
-    private int seconds = startMinutes * 60;
+    private int startMinutes;
+    private int seconds;
 
     public PregameCountdown( TeamBattlePlugin teamBattlePlugin ) {
         this.teamBattlePlugin = teamBattlePlugin;
-        this.game = teamBattlePlugin.getGame();
+        game = teamBattlePlugin.getGame();
+        startMinutes = game.getGameConfig().getProtectionMinutes();
+        seconds = startMinutes * 60;
     }
 
     public void start() {
         bukkitTask = Bukkit.getScheduler().runTaskTimer( teamBattlePlugin, this::run, 20L, 20L );
+        Bukkit.getScheduler().runTaskLater( teamBattlePlugin, game.getGameConfig().getSpawnRegion()::dissolve, 15 * 20L );
         game.sendGameMessage( "§eIhr habt nun §a" + startMinutes + " Minuten §eZeit um euch auf die Kriegsphase vorzubereiten!" );
         game.sendGameMessage( "§eViel Spaß! c:" );
         game.playGameSound( Sound.LEVEL_UP, 1, 1 );
@@ -34,10 +37,10 @@ public class PregameCountdown {
 
     private void run() {
         seconds--;
-        if ( seconds == 0 ) {
+        if ( seconds <= 0 ) {
             game.changeGameState();
             bukkitTask.cancel();
-        } else if ( seconds % 300 == 0 ) {
+        } else if ( seconds % 300 == 0 || seconds == 180 || seconds == 120 ) {
             int minutes = seconds / 60;
             game.sendGameMessage( "§eDie Kriegsphase beginnt in §5" + minutes + " §eMinuten!" );
             game.playGameSound( Sound.NOTE_PLING, 1, 1 );

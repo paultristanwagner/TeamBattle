@@ -11,9 +11,7 @@ import de.teamcreate.teambattle.inventoryhandler.OperatorInventoryHandler;
 import de.teamcreate.teambattle.inventoryhandler.RulesInventoryHandler;
 import de.teamcreate.teambattle.inventoryhandler.TeamSelectInventoryHandler;
 import de.teamcreate.teambattle.util.ItemUtils;
-import org.bukkit.GameMode;
-import org.bukkit.Material;
-import org.bukkit.Sound;
+import org.bukkit.*;
 import org.bukkit.entity.Horse;
 import org.bukkit.entity.Pig;
 import org.bukkit.entity.Player;
@@ -30,6 +28,7 @@ import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.inventory.CraftItemEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.player.*;
+import org.bukkit.event.weather.WeatherChangeEvent;
 import org.bukkit.inventory.ItemStack;
 import org.spigotmc.event.entity.EntityMountEvent;
 
@@ -62,7 +61,12 @@ public class GameListener implements Listener {
         event.setJoinMessage( null );
         Player player = event.getPlayer();
         if ( game.getGameState() != GameState.PREGAME ) {
-            game.setSpectator( player );
+            if ( game.getReconnectHandler().hasReconnectProfile( player ) ) {
+                game.getReconnectHandler().useReconnectProfile( player );
+                game.sendGameMessage( "§7Der Spieler §e" + player.getName() + " §7ist wieder zurück im Spiel!" );
+            } else {
+                game.setSpectator( player );
+            }
         } else {
             game.setPlayer( player );
         }
@@ -90,8 +94,8 @@ public class GameListener implements Listener {
 
     @EventHandler
     public void onPlayerDeath( PlayerDeathEvent event ) {
-        Player player = event.getEntity();
         event.setDeathMessage( null );
+        Player player = event.getEntity();
         TeamBattleTeam team = game.getTeamHandler().getTeam( player );
         if ( team != null ) {
             if ( player.getKiller() != null ) {
@@ -101,8 +105,12 @@ public class GameListener implements Listener {
             } else {
                 game.sendGameMessage( "§7Der Spieler §c" + player.getName() + " §7ist gestorben!" );
             }
-            team.removeMember( player );
-            game.setSpectator( player );
+            game.getTeamHandler().quitTeam( team, player );
+            Bukkit.getScheduler().runTask( teamBattlePlugin, () -> {
+                if ( player.isOnline() ) {
+                    game.setSpectator( player );
+                }
+            } );
         }
     }
 
@@ -113,10 +121,15 @@ public class GameListener implements Listener {
         if ( game.getGameState() == GameState.PREGAME ) {
             TeamBattleTeam team = game.getTeamHandler().getTeam( player );
             if ( team != null ) {
-                team.removeMember( player );
+                game.getTeamHandler().quitTeam( team, player );
             }
-        } else if ( game.getGameState().isWinable() && game.getTeamHandler().getTeam( player ) != null ) {
-            player.setHealth( 0 );
+        } else if ( game.getGameState().isWinAble() && game.getTeamHandler().getTeam( player ) != null ) {
+            if ( player.getKiller() != null ) {
+                player.setHealth( 0 );
+            } else {
+                game.getReconnectHandler().handleAccidentalDisconnect( player );
+                game.sendGameMessage( "§7Der Spieler §e" + player.getName() + " §7hat das Spiel unerwartet verlassen." );
+            }
         }
     }
 
@@ -165,7 +178,7 @@ public class GameListener implements Listener {
     }
 
     @EventHandler
-    public void onPlayerInteractAtEnity( PlayerInteractEntityEvent event ) {
+    public void onPlayerInteractAtEntity( PlayerInteractEntityEvent event ) {
         Player player = event.getPlayer();
         if ( player.getGameMode() != GameMode.CREATIVE && !game.getGameState().isInteractionAllowed() ) {
             event.setCancelled( true );
@@ -173,7 +186,7 @@ public class GameListener implements Listener {
     }
 
     @EventHandler( priority = EventPriority.LOW )
-    public void onInventoyClick( InventoryClickEvent event ) {
+    public void onInventoryClick( InventoryClickEvent event ) {
         if ( event.getWhoClicked() instanceof Player ) {
             Player player = ( (Player) event.getWhoClicked() );
             if ( player.getGameMode() != GameMode.CREATIVE && !game.getGameState().isInteractionAllowed() ) {
@@ -222,7 +235,7 @@ public class GameListener implements Listener {
 
     @EventHandler
     public void onPlayerRespawn( PlayerRespawnEvent event ) {
-        event.setRespawnLocation( game.getSpawnLocation() );
+        event.setRespawnLocation( game.getGameConfig().getSpawnLocation() );
     }
 
     @EventHandler
@@ -233,14 +246,26 @@ public class GameListener implements Listener {
     }
 
     @EventHandler
+    public void onWeatherChange( WeatherChangeEvent event ) {
+        if ( game.getGameState() == GameState.PREGAME ) {
+            event.setCancelled( true );
+        }
+    }
+
+    @EventHandler
     public void onGameStateChange( GameStateChangeEvent event ) {
         GameState gameState = event.getNewState();
         if ( gameState == GameState.PROTECTION ) {
+            World world = game.getGameConfig().getSpawnLocation().getWorld();
+            world.setGameRuleValue( "doDaylightCycle", "true" );
             game.resetPlayers();
             game.startCountdown();
         } else if ( gameState == GameState.INGAME ) {
+            game.getBorderHandler().startShrinking();
             game.sendGameMessage( "§cDie Kriegsphase hat begonnen!" );
             game.playGameSound( Sound.ENDERDRAGON_GROWL, 1, 1 );
+        } else if ( gameState == GameState.END ) {
+            game.getBorderHandler().stopShrinking();
         }
     }
 
@@ -255,7 +280,7 @@ public class GameListener implements Listener {
     public void onPlayerQuitTeam( PlayerQuitTeamEvent event ) {
         if ( game.getGameState() == GameState.PREGAME && !event.isSwitching() ) {
             game.getTeamHandler().updateInventories();
-        } else if ( game.getGameState().isWinable() ) {
+        } else if ( game.getGameState().isWinAble() ) {
             TeamBattleTeam winnerTeam = game.getTeamHandler().getRemainingTeam();
             if ( winnerTeam != null ) {
                 game.win( winnerTeam );

@@ -42,9 +42,9 @@ public class TeamSelectInventoryHandler extends InventoryHandler {
                 if ( !newTeam.isFull() ) {
                     TeamBattleTeam currentTeam = game.getTeamHandler().getTeam( player );
                     if ( currentTeam != null ) {
-                        currentTeam.switchTeams( player, newTeam );
+                        game.getTeamHandler().switchTeams( currentTeam, newTeam, player );
                     } else {
-                        newTeam.addMember( player );
+                        game.getTeamHandler().joinTeam( newTeam, player );
                     }
                     player.playSound( player.getLocation(), Sound.NOTE_PLING, 1, 1 );
                 } else {
@@ -62,7 +62,8 @@ public class TeamSelectInventoryHandler extends InventoryHandler {
 
     @Override
     protected Inventory createInventory() {
-        inventory = Bukkit.createInventory( null, 18, "§aTeamauswahl§7:" );
+        int inventorySize = ( (int) ( Math.ceil( game.getGameConfig().getTeams() / 9.0 ) * 9 ) );
+        inventory = Bukkit.createInventory( null, inventorySize, "§aTeamauswahl§7:" );
         fillInventory();
         return inventory;
     }

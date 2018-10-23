@@ -20,7 +20,7 @@ public enum GameState {
 
     private GameState nextState;
     private boolean peaceful;
-    private boolean winable;
+    private boolean winAble;
     private boolean spectatorChatEnabled;
     private boolean interactionAllowed;
 }

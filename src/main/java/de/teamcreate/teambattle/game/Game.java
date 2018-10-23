@@ -5,8 +5,10 @@ import de.teamcreate.teambattle.countdown.PregameCountdown;
 import de.teamcreate.teambattle.event.GameStateChangeEvent;
 import de.teamcreate.teambattle.util.ItemUtils;
 import lombok.Getter;
-import org.bukkit.*;
-import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.Bukkit;
+import org.bukkit.GameMode;
+import org.bukkit.Sound;
+import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.potion.PotionEffect;
 
@@ -22,16 +24,28 @@ import java.util.List;
 public class Game {
 
     private TeamBattlePlugin teamBattlePlugin;
-    private Location spawnLocation;
+
+    private GameConfig gameConfig;
     private GameState gameState;
+    private BorderHandler borderHandler;
     private TeamHandler teamHandler;
+    private ReconnectHandler reconnectHandler;
     private PregameCountdown pregameCountdown;
 
     public Game( TeamBattlePlugin teamBattlePlugin ) {
         this.teamBattlePlugin = teamBattlePlugin;
-        this.teamHandler = new TeamHandler( 12 );
-        this.gameState = GameState.PREGAME;
-        fetchSpawnLocation();
+
+        gameConfig = GameConfig.loadConfig( teamBattlePlugin );
+        borderHandler = new BorderHandler( gameConfig );
+        teamHandler = new TeamHandler( gameConfig.getTeams(), gameConfig.getTeamSize() );
+        reconnectHandler = new ReconnectHandler( this );
+        gameState = GameState.PREGAME;
+
+        World world = gameConfig.getSpawnLocation().getWorld();
+        world.setThundering( false );
+        world.setStorm( false );
+        world.setTime( 1000 );
+        world.setGameRuleValue( "doDaylightCycle", "false" );
     }
 
     public void sendGameMessage( String message ) {
@@ -60,6 +74,7 @@ public class Game {
 
     public void setPlayer( Player player ) {
         resetPlayer( player );
+        player.teleport( gameConfig.getSpawnLocation() );
         player.getInventory().setItem( 0, ItemUtils.TEAM_SELECT );
         player.getInventory().setItem( 4, ItemUtils.RULES );
         if ( player.isOp() ) {
@@ -85,35 +100,34 @@ public class Game {
         player.setSaturation( 6 );
         player.setLevel( 0 );
         player.setExp( 0 );
-        player.teleport( spawnLocation );
     }
 
     public void setSpectator( Player player ) {
         player.setGameMode( GameMode.SPECTATOR );
+        player.teleport( gameConfig.getSpawnLocation() );
         sendGameMessage( player, "Du bist nun Zuschauer!" );
-        player.teleport( spawnLocation );
     }
 
     public void attemptStart( Player operator ) {
-        boolean startable = true;
+        boolean bootAble = true;
         StringBuilder builder = new StringBuilder();
         for ( Player player : Bukkit.getOnlinePlayers() ) {
             TeamBattleTeam team = teamHandler.getTeam( player );
             if ( team == null ) {
-                startable = false;
+                bootAble = false;
                 builder.append( ", " ).append( player.getName() );
             }
         }
         if ( builder.length() > 0 ) {
-            startable = false;
+            bootAble = false;
             sendGameMessage( operator, "§cDas Spiel kann nicht gestartet werden, da folgende§7/§cr Spieler noch keinem " +
                     "Team zugeordnet sind§7/§cist§7: §b" + builder.substring( 2 ) );
         }
         if ( teamHandler.getUsedTeams() <= 1 ) {
             sendGameMessage( operator, "§cDas Spiel kann nicht gestartet werden, da nicht genügend Teams teilnehmen!" );
-            startable = false;
+            bootAble = false;
         }
-        if ( startable ) {
+        if ( bootAble ) {
             changeGameState();
         } else {
             operator.playSound( operator.getLocation(), Sound.NOTE_BASS, 1, 1 );
@@ -143,21 +157,6 @@ public class Game {
         if ( pregameCountdown != null ) {
             pregameCountdown.stop();
         }
-    }
-
-    private void fetchSpawnLocation() {
-        FileConfiguration fileConfiguration = teamBattlePlugin.getConfig();
-        String worldName = fileConfiguration.getString( "gameSpawn.world", "world" );
-        double x = fileConfiguration.getDouble( "gameSpawn.x", 0 );
-        double y = fileConfiguration.getDouble( "gameSpawn.y", 5 );
-        double z = fileConfiguration.getDouble( "gameSpawn.z", 0 );
-        float yaw = ( (float) fileConfiguration.getDouble( "gameSpawn.yaw", 0 ) );
-        float pitch = ( (float) fileConfiguration.getDouble( "gameSpawn.pitch", 0 ) );
-        World world = Bukkit.getWorld( worldName );
-        if ( world == null ) {
-            world = Bukkit.getWorlds().get( 0 );
-        }
-        this.spawnLocation = new Location( world, x, y, z, yaw, pitch );
     }
 
     public void win( TeamBattleTeam winnerTeam ) {

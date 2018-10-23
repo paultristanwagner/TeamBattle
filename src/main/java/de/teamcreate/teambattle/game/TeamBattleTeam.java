@@ -1,7 +1,5 @@
 package de.teamcreate.teambattle.game;
 
-import de.teamcreate.teambattle.event.PlayerJoinTeamEvent;
-import de.teamcreate.teambattle.event.PlayerQuitTeamEvent;
 import lombok.Getter;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -20,59 +18,72 @@ import java.util.List;
  */
 public class TeamBattleTeam {
 
-    public static final int MAXIMUM_MEMBERS = 3;
-
-    private Scoreboard scoreboard;
-    private Team scoreboardTeam;
-
+    private TeamHandler teamHandler;
+    @Getter
+    private int teamSize;
+    @Getter
+    private int teamId;
     @Getter
     private String teamName;
     @Getter
     private List<Player> members = new ArrayList<>();
+    @Getter
+    private Scoreboard scoreboard;
 
-    public TeamBattleTeam( int teamId ) {
-        this.teamName = "Team #" + teamId;
-        setupScoreboard();
+
+    TeamBattleTeam( TeamHandler teamHandler, int teamId, int teamSize ) {
+        this.teamHandler = teamHandler;
+        this.teamId = teamId;
+        this.teamSize = teamSize;
+        teamName = "Team #" + teamId;
     }
 
-    private void setupScoreboard() {
+    void setupScoreboard() {
         ScoreboardManager scoreboardManager = Bukkit.getScoreboardManager();
         scoreboard = scoreboardManager.getNewScoreboard();
-        scoreboardTeam = scoreboard.getTeam( teamName );
-        if ( scoreboardTeam != null ) {
-            scoreboardTeam.unregister();
+        teamHandler.getTeams().forEach( teamBattleTeam -> createTeam( scoreboard, teamBattleTeam ) );
+    }
+
+    private void createTeam( Scoreboard scoreboard, TeamBattleTeam teamBattleTeam ) {
+        Team team = scoreboard.getTeam( String.valueOf( teamBattleTeam.getTeamName() ) );
+        if ( team != null ) {
+            team.unregister();
         }
-        scoreboardTeam = scoreboard.registerNewTeam( teamName );
-        scoreboardTeam.setPrefix( "§a" );
+        team = scoreboard.registerNewTeam( String.valueOf( teamBattleTeam.getTeamName() ) );
+        if ( teamBattleTeam == this ) {
+            team.setPrefix( "§aT" + teamBattleTeam.getTeamId() + " | " );
+        } else {
+            team.setPrefix( "T" + teamBattleTeam.getTeamId() + " | " );
+        }
     }
 
-    public boolean isMember( Player player ) {
-        return members.contains( player );
+    boolean isMember( Player player ) {
+        return members.stream().anyMatch( member -> member.getUniqueId().equals( player.getUniqueId() ) );
     }
 
-    public void addMember( Player player ) {
-        members.add( player );
-        scoreboardTeam.addEntry( player.getName() );
-        player.setScoreboard( scoreboard );
-        Bukkit.getPluginManager().callEvent( new PlayerJoinTeamEvent( player, this ) );
+    void handleMemberAdd( TeamBattleTeam teamBattleTeam, Player player ) {
+        if ( teamBattleTeam == this ) {
+            members.add( player );
+            player.setScoreboard( scoreboard );
+        }
+        Team team = scoreboard.getTeam( teamBattleTeam.getTeamName() );
+        team.addEntry( player.getName() );
     }
 
-    public void removeMember( Player player ) {
-        members.remove( player );
-        scoreboardTeam.removeEntry( player.getName() );
-        player.setScoreboard( Bukkit.getScoreboardManager().getMainScoreboard() );
-        Bukkit.getPluginManager().callEvent( new PlayerQuitTeamEvent( player, this ) );
+    void handleMemberRemove( TeamBattleTeam teamBattleTeam, Player player ) {
+        if ( teamBattleTeam == this ) {
+            members.remove( player );
+            player.setScoreboard( Bukkit.getScoreboardManager().getMainScoreboard() );
+        }
+        Team team = scoreboard.getTeam( teamBattleTeam.getTeamName() );
+        team.removeEntry( player.getName() );
     }
 
-    public void switchTeams( Player player, TeamBattleTeam newTeam ) {
-        members.remove( player );
-        scoreboardTeam.removeEntry( player.getName() );
-        player.setScoreboard( Bukkit.getScoreboardManager().getMainScoreboard() );
-        Bukkit.getPluginManager().callEvent( new PlayerQuitTeamEvent( player, this, true ) );
-        newTeam.addMember( player );
+    boolean arePlayersOnline() {
+        return members.stream().allMatch( Player::isOnline );
     }
 
     public boolean isFull() {
-        return members.size() == MAXIMUM_MEMBERS;
+        return members.size() == teamSize;
     }
 }

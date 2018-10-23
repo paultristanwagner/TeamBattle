@@ -51,11 +51,11 @@ public class ItemUtils {
             itemBuilder.setDurability( 8 );
         }
         itemBuilder.setName( "§e" + teamBattleTeam.getTeamName() ).addLore(
-                "§3" + teamBattleTeam.getMembers().size() + "§7/§3" + TeamBattleTeam.MAXIMUM_MEMBERS,
+                "§3" + teamBattleTeam.getMembers().size() + "§7/§3" + teamBattleTeam.getTeamSize(),
                 "§7--------------------------"
         );
         List<Player> members = teamBattleTeam.getMembers();
-        for ( int i = 1; i <= TeamBattleTeam.MAXIMUM_MEMBERS; i++ ) {
+        for ( int i = 1; i <= teamBattleTeam.getTeamSize(); i++ ) {
             if ( i <= members.size() ) {
                 Player member = members.get( i - 1 );
                 if ( !member.equals( player ) ) {

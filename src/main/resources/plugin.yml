@@ -1,5 +1,5 @@
 name: TeamBattle
-version: 1.1
+version: 1.2
 author: LetsPeee
 main: de.teamcreate.teambattle.TeamBattlePlugin
 commands:
