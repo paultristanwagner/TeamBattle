@@ -1,5 +1,3 @@
-![Pipeline](http://164.132.204.23:4444/TeamCreate/teambattle/badges/master/build.svg) ![Version](https://img.shields.io/badge/release-v1.2-blue.svg)
-
 # TeamBattle
 Bei TeamBattle handelt es sich um ein Spiel für beliebig viele Spieler, welche in kleinen Teams gegeneinander antreten.
 Das Spiel ist dabei in verschiedene Spielphasen eingeteilt.
